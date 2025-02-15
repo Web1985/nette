@@ -49,6 +49,19 @@ services:
     networks:
       - nette_network
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: nette_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com  # Логин
+      PGADMIN_DEFAULT_PASSWORD: admin  # Пароль
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - nette_network
+
 networks:
   nette_network:
     driver: bridge

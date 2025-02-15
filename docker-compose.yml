@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+  php:
+    build: ./php
+    container_name: nette_php
+    volumes:
+      - ./backend:/var/www/html  # Локальная папка для Nette
+    networks:
+      - nette_network
+    depends_on:
+      - db
+      - redis
+    environment:
+      - COMPOSER_HOME=/tmp
+
+  nginx:
+    image: nginx:latest
+    container_name: nette_nginx
+    ports:
+      - "8090:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - nette_network
+
+  db:
+    image: postgres:15
+    container_name: nette_db
+    environment:
+      POSTGRES_USER: nette_user
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: nette_db
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    ports:
+      - "5452:5432"
+    networks:
+      - nette_network
+
+  redis:
+    image: redis:latest
+    container_name: nette_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - nette_network
+
+networks:
+  nette_network:
+    driver: bridge
